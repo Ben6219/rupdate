@@ -1,3 +1,4 @@
+**Version:** 1.0.1
 # 🧩 rupdate.sh — Synchroniseur de bibliothèques pour DaVinci Resolve sous Linux
 
 ## 🎬 Présentation
