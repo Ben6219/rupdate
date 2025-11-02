@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# rupdate.sh — hotfix: blocs case simplifiés, compatible bash, sans pièges
+# rupdate.sh — hotfix ShellCheck clean
 set -euo pipefail
 
 resolve_libs="/opt/resolve/libs"
@@ -27,7 +27,7 @@ confirm() {
   [ "${_a:-}" = "o" ] || [ "${_a:-}" = "O" ]
 }
 
-# ---------- Parse options (case simple, sans imbrication) ----------
+# ---------- Parse options ----------
 while [ $# -gt 0 ]; do
   opt="$1"
   case "$opt" in
@@ -48,27 +48,37 @@ while [ $# -gt 0 ]; do
   esac
 done
 
-# ---------- Détection famille distro (sans =~, via case insensible) ----------
+# ---------- Détection famille distro (if/elif pour éviter SC2221/2222) ----------
 detect_family() {
   local id like
   id=""; like=""
-  if [ -r /etc/os-release ]; then . /etc/os-release; fi
+  if [ -r /etc/os-release ]; then
+    # shellcheck disable=SC1091
+    . /etc/os-release
+  fi
   id=$(printf '%s' "${ID:-}" | tr '[:upper:]' '[:lower:]')
   like=$(printf '%s' "${ID_LIKE:-}" | tr '[:upper:]' '[:lower:]')
 
-  case "$id,$like" in
-    *opensuse*|*sles*|*,*suse*)                echo "suse" ;;
-    *fedora*|*rhel*|*rocky*|*alma*|*centos*|*,*rhel*|*,*fedora*|*,*centos*) echo "rhel" ;;
-    *debian*|*ubuntu*|*linuxmint*|*pop*|*zorin*|*kali*|*parrot*|*,*debian*|*,*ubuntu*) echo "debian" ;;
-    *arch*|*manjaro*|*garuda*|*endeavouros*)   echo "arch" ;;
-    *gentoo*|*calculate*)                      echo "gentoo" ;;
-    *)                                         echo "generic" ;;
-  esac
+  if [[ "$id" == *opensuse* || "$id" == *sles* || "$like" == *suse* ]]; then
+    echo "suse"; return
+  elif [[ "$id" == *fedora* || "$id" == *rhel* || "$id" == *rocky* || "$id" == *alma* || "$id" == *centos* \
+       || "$like" == *rhel* || "$like" == *fedora* || "$like" == *centos* ]]; then
+    echo "rhel"; return
+  elif [[ "$id" == *debian* || "$id" == *ubuntu* || "$id" == *linuxmint* || "$id" == *pop* || "$id" == *zorin* || "$id" == *kali* || "$id" == *parrot* \
+       || "$like" == *debian* || "$like" == *ubuntu* ]]; then
+    echo "debian"; return
+  elif [[ "$id" == *arch* || "$id" == *manjaro* || "$id" == *garuda* || "$id" == *endeavouros* ]]; then
+    echo "arch"; return
+  elif [[ "$id" == *gentoo* || "$id" == *calculate* ]]; then
+    echo "gentoo"; return
+  else
+    echo "generic"; return
+  fi
 }
 
 family="$(detect_family)"
 
-# ---------- Chemins système par famille (case simple) ----------
+# ---------- Chemins système ----------
 system_dirs=()
 case "$family" in
   suse|rhel|gentoo|arch)
@@ -88,7 +98,7 @@ get_version() {
   # extrait après base: libglib-2.0.so.0.8600.1 -> 8600.1
   local p="$1" base="$2" b
   b="$(basename "$p")"
-  printf "%s" "${b#${base}.}"
+  printf "%s" "${b#"${base}".}"
 }
 
 ver_lt() {
@@ -138,9 +148,12 @@ find_best_in_system() {
       if [ -n "$paths" ]; then
         local lines=()
         while IFS= read -r c; do
-          [ -n "$c" ] && [ -e "$c" ] || continue
-          v="$(get_version "$c" "$base")"
-          lines+=("$v"$'\t'"$c")
+          if [ -n "$c" ] && [ -e "$c" ]; then
+            v="$(get_version "$c" "$base")"
+            lines+=("$v"$'\t'"$c")
+          else
+            continue
+          fi
         done <<< "$paths"
         if [ ${#lines[@]} -gt 0 ]; then
           best="$(printf "%s\n" "${lines[@]}" | LC_ALL=C sort -V -k1,1 | tail -n1 | cut -f2-)"
@@ -158,9 +171,12 @@ find_best_in_system() {
     if [ -n "$paths" ]; then
       local lines=()
       while IFS= read -r c; do
-        [ -n "$c" ] && [ -e "$c" ] || continue
-        v="$(get_version "$c" "$base")"
-        lines+=("$v"$'\t'"$c")
+        if [ -n "$c" ] && [ -e "$c" ]; then
+          v="$(get_version "$c" "$base")"
+          lines+=("$v"$'\t'"$c")
+        else
+          continue
+        fi
       done <<< "$paths"
       if [ ${#lines[@]} -gt 0 ]; then
         best="$(printf "%s\n" "${lines[@]}" | LC_ALL=C sort -V -k1,1 | tail -n1 | cut -f2-)"
@@ -302,7 +318,7 @@ if [ ${#outdated[@]} -gt 0 ]; then
         fi
         echo "Remplacement: $src -> $dst"; safe_install "$src" "$dst"
       done
-      if command -v selinuxenabled >/dev/null 2>&1 && selinuxenabled && command -v restorecon >/dev/null 2>&1; then
+      if command -v selinuxenabled >/dev/null 2>&1 && selinuxenabled && command -v restorecon >/devnull 2>&1; then
         if [ "$DRY_RUN" -eq 1 ]; then echo "[dry-run] restorecon -R \"$resolve_libs\""; else restorecon -R "$resolve_libs" || true; fi
       fi
       echo "Remplacement terminé."
