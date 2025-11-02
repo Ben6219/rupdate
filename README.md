@@ -1,6 +1,8 @@
 **Version:** 1.0.1
 # 🧩 rupdate.sh — Synchroniseur de bibliothèques pour DaVinci Resolve sous Linux
 
+![CI](https://github.com/Ben6219/rupdate/actions/workflows/shellcheck.yml/badge.svg)
+
 ## 🎬 Présentation
 **rupdate.sh** est un script Bash libre conçu pour les utilisateurs Linux de **DaVinci Resolve**, afin de synchroniser automatiquement les bibliothèques `libglib`, `libgio`, `libgmodule` et `libgobject` entre le dossier d’installation de Resolve (`/opt/resolve/libs`) et les versions système.
 
