@@ -1,39 +1,45 @@
-**Version:** 1.0.1
-# 🧩 rupdate.sh — Synchroniseur de bibliothèques pour DaVinci Resolve sous Linux
+[![ShellCheck](https://github.com/Ben6219/rupdate/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/Ben6219/rupdate/actions/workflows/shellcheck.yml)
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
+![Version](https://img.shields.io/badge/version-1.3.2-brightgreen.svg)
 
-![CI](https://github.com/Ben6219/rupdate/actions/workflows/shellcheck.yml/badge.svg)
 
-## 🎬 Présentation
-**rupdate.sh** est un script Bash libre conçu pour les utilisateurs Linux de **DaVinci Resolve**, afin de synchroniser automatiquement les bibliothèques `libglib`, `libgio`, `libgmodule` et `libgobject` entre le dossier d’installation de Resolve (`/opt/resolve/libs`) et les versions système.
+# 🧩 rupdate.sh
 
-Il vérifie les versions installées, copie les fichiers manquants, remplace les plus anciens par les plus récents, et crée des sauvegardes automatiques `.bak.YYYYmmdd-HHMMSS`.
+**rupdate.sh** est un script libre (licence MIT) permettant de **corriger automatiquement les bibliothèques GLib** utilisées par *DaVinci Resolve* sous Linux.  
+Il gère également la **détection automatique des installeurs `.run`**, la **désinstallation** et la **mise à niveau** de Resolve, ainsi qu’une **interface de menu simple et claire**.
 
-## ⚙️ Fonctionnalités principales
-- Détection automatique de la distribution
-- Comparaison complète des versions
-- Copie et remplacement automatiques avec sauvegarde
-- Vérification simple avec `--check`
-- Support de `ldconfig -p` et fallback sur les répertoires systèmes
-- Licence MIT libre et ouverte
+---
 
-## 🧪 Options disponibles
-| Option | Description |
-|:--------|:-------------|
-| `--check` | Lecture seule (aucune modification) |
-| `--yes` | Répond automatiquement “oui” à toutes les confirmations |
-| `--no-ldconfig` | N’utilise pas `ldconfig -p` |
-| `--fast` | Utilise uniquement `ldconfig -p` |
-| `--purge-bak [JOURS]` | Supprime les backups `.bak.*` plus anciens que *JOURS* (90 par défaut) |
-| `-h`, `--help` | Affiche l’aide |
+## ✨ Fonctionnalités
 
-## ⚖️ Licence (MIT)
-© 2025 — Collaboration entre *Ben6219* & *ChatGPT*
+- 🔍 Compare les bibliothèques de `/opt/resolve/libs` avec celles du système.  
+- 🧱 Copie les fichiers manquants et remplace les versions obsolètes.  
+- 🗂️ Sauvegarde automatique (`.bak.YYYYmmdd-HHMMSS`).  
+- 💾 Auto-détection des installeurs `.run` dans `.` / `~/Téléchargements` / `~/Downloads`.  
+- 🌀 Menu interactif persistant (v1.3.2, robuste sous sudo).  
+- 🧹 Purge des anciennes sauvegardes.  
+- 🔁 Mise à jour / désinstallation complète de Resolve.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the “Software”), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, subject to the following conditions:
+---
 
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
+## 🧠 Compatibilité
+
+✅ Testé sur :
+- openSUSE Tumbleweed (référence)
+- Fedora Workstation
+- Ubuntu / Debian
+- Arch Linux / Manjaro
+- Gentoo
+
+> ⚠️ Les systèmes à base AMDGPU-Pro sont parfois instables avec Resolve.  
+> La meilleure stabilité est observée sur plateformes **NVIDIA + openSUSE / Fedora**.
+
+---
+
+## 🧩 Installation
+
+```bash
+git clone https://github.com/Ben6219/rupdate.git
+cd rupdate
+chmod +x rupdate.sh
+sudo ./rupdate.sh
